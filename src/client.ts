@@ -6,6 +6,9 @@ let y = 100;
 let x2 = 500;
 let y2 = 500;
 const speed = 3;
+let flashUntil = 0; // timestamp (ms) when flash ends
+const flashDurationMs = 120; // tweak 80–200ms to taste
+let fWasDown = false; // edge detection so holding F doesn’t spam
 
 const keys: Record<string, boolean> = {};
 
@@ -18,20 +21,43 @@ window.addEventListener("keyup", (e) => {
 });
 
 function update() {
-  if (keys["ArrowLeft"]) x2 -= speed;
-  if (keys["ArrowRight"]) x2 += speed;
-  if (keys["ArrowUp"]) y2 -= speed;
-  if (keys["ArrowDown"]) y2 += speed;
+  // i need a state, that state should be set to which players turn it is..  and everytime the flashin() is called the state changes
+  // Detect F press (down-edge)
+  function flashin() {
+    const fIsDown = !!keys["f"];
+    if (fIsDown && !fWasDown) {
+      flashUntil = performance.now() + flashDurationMs;
+    }
+    fWasDown = fIsDown;
+  }
+  flashin();
+
+  //Player One Controls
   if (keys["a"]) x -= speed;
   if (keys["d"]) x += speed;
   if (keys["w"]) y -= speed;
   if (keys["s"]) y += speed;
+
+  // Player Two Controls
+  if (keys["ArrowLeft"]) x2 -= speed;
+  if (keys["ArrowRight"]) x2 += speed;
+  if (keys["ArrowUp"]) y2 -= speed;
+  if (keys["ArrowDown"]) y2 += speed;
 }
 
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const now = performance.now();
+
+  // Background
+  ctx.fillStyle = now < flashUntil ? "red" : "#222";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Player 1
   ctx.fillStyle = "white";
   ctx.fillRect(x, y, 50, 50);
+
+  // Player 2 (example)
+  ctx.fillStyle = "black";
   ctx.fillRect(x2, y2, 50, 50);
 }
 
