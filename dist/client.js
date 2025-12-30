@@ -19,6 +19,10 @@ let attackUntil = 0;
 let hasHitThisAttack = false;
 // Facing: 1 = right, -1 = left
 let facing = 1;
+//HP
+let maxHP = 100;
+let currentHP = 100;
+let maxHPBar = 200;
 // Input
 const keys = {};
 window.addEventListener("keydown", (e) => {
@@ -60,14 +64,16 @@ function update() {
     if (keys["s"])
         y += speed;
     // --- PLAYER TWO MOVEMENT ---
-    if (keys["ArrowLeft"])
+    if (keys["ArrowLeft"]) {
         x2 -= speed;
-    if (player === 1)
-        facing = -1;
-    if (keys["ArrowRight"])
+        if (player === 1)
+            facing = -1;
+    }
+    if (keys["ArrowRight"]) {
         x2 += speed;
-    if (player === 1)
-        facing = -1;
+        if (player === 1)
+            facing = 1;
+    }
     if (keys["ArrowUp"])
         y2 -= speed;
     if (keys["ArrowDown"])
@@ -88,6 +94,8 @@ function update() {
         if (rectsOverlap(attackBox, target)) {
             hasHitThisAttack = true;
             flashUntil = now + 80;
+            currentHP = currentHP - 10;
+            maxHPBar = maxHPBar - 50;
             player = player === 0 ? 1 : 0;
             console.log("turn switched to", player);
         }
@@ -133,6 +141,18 @@ function draw() {
     ctx.fillText(`Turn: Player ${player + 1}`, 10, 60);
     ctx.fillText("P1: WASD + F to attack", 10, 20);
     ctx.fillText("P2: Arrow keys", 10, 40);
+    //player 1 health bar
+    ctx.fillStyle = "purple";
+    ctx.fillRect(200, 10, maxHPBar, 20);
+    ctx.strokeRect(200, 10, 200, 20);
+    ctx.fillStyle = "yellow";
+    ctx.fillText(`Player 1 ${currentHP} / ${maxHP}`, 200, 20);
+    //player 2 health bar
+    ctx.fillStyle = "yellow";
+    ctx.fillRect(410, 10, maxHPBar, 20);
+    ctx.strokeRect(410, 10, 200, 20);
+    ctx.fillStyle = "purple";
+    ctx.fillText(`Player 2 ${currentHP} / ${maxHP}`, 415, 20);
 }
 function loop() {
     update();
