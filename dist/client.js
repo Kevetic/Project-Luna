@@ -19,10 +19,14 @@ let attackUntil = 0;
 let hasHitThisAttack = false;
 // Facing: 1 = right, -1 = left
 let facing = 1;
-//HP
+//Player One HP
 let maxHP = 100;
 let currentHP = 100;
-let maxHPBar = 200;
+//Player Two HP
+let maxHPTwo = 100;
+let currentHPTwo = 100;
+//Health Bar
+const fullBarWidth = 200;
 // Input
 const keys = {};
 window.addEventListener("keydown", (e) => {
@@ -94,10 +98,23 @@ function update() {
         if (rectsOverlap(attackBox, target)) {
             hasHitThisAttack = true;
             flashUntil = now + 80;
-            currentHP = currentHP - 10;
-            maxHPBar = maxHPBar - 50;
+            if (player === 0) {
+                currentHPTwo -= 10;
+                if (currentHPTwo < 0)
+                    currentHPTwo = 0;
+            }
+            else {
+                currentHP -= 10;
+                if (currentHP < 0)
+                    currentHP = 0;
+            }
+            if (currentHP <= 0) {
+                alert("Player Two Wins");
+            }
+            else if (currentHPTwo <= 0) {
+                alert("Player One Wins");
+            }
             player = player === 0 ? 1 : 0;
-            console.log("turn switched to", player);
         }
     }
 }
@@ -141,18 +158,22 @@ function draw() {
     ctx.fillText(`Turn: Player ${player + 1}`, 10, 60);
     ctx.fillText("P1: WASD + F to attack", 10, 20);
     ctx.fillText("P2: Arrow keys", 10, 40);
+    const ratio1 = currentHP / maxHP;
+    const ratio2 = currentHPTwo / maxHPTwo;
+    const barWidth1 = ratio1 * fullBarWidth;
+    const barWidth2 = ratio2 * fullBarWidth;
     //player 1 health bar
     ctx.fillStyle = "purple";
-    ctx.fillRect(200, 10, maxHPBar, 20);
+    ctx.fillRect(200, 10, barWidth1, 20);
     ctx.strokeRect(200, 10, 200, 20);
     ctx.fillStyle = "yellow";
     ctx.fillText(`Player 1 ${currentHP} / ${maxHP}`, 200, 20);
     //player 2 health bar
     ctx.fillStyle = "yellow";
-    ctx.fillRect(410, 10, maxHPBar, 20);
+    ctx.fillRect(410, 10, barWidth2, 20);
     ctx.strokeRect(410, 10, 200, 20);
     ctx.fillStyle = "purple";
-    ctx.fillText(`Player 2 ${currentHP} / ${maxHP}`, 415, 20);
+    ctx.fillText(`Player 2 ${currentHPTwo} / ${maxHPTwo}`, 415, 20);
 }
 function loop() {
     update();
